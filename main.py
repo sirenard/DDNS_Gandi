@@ -35,10 +35,11 @@ def update_dns_with_my_ip(conn: GandiAPI, fqdn: str, rrset_name: str, rrset_type
 
     # If the status code is 404 (record does not exist.) and we want to create it, then we don't want to raise
     # exceptions
-    if result.status_code != 404 or not create_if_not_exist:
+    if result.status_code != 404 and not create_if_not_exist:
         raise_status_code(result, result.status_code)
-
-    current_record_ip = result.json()["rrset_values"][0]
+        current_record_ip = result.json()["rrset_values"][0]
+    else:
+        current_record_ip = None
 
     if current_record_ip == my_ip:
         return False
