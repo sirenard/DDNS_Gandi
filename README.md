@@ -4,9 +4,9 @@ A Dynamic DNS script for gandi.net services
 ## Usage
 
 ```
-usage: main.py [-h] --token TOKEN --fqdn FQDN --rrset_name RRSET_NAME [--create_if_not_exist] [--verbose]
+usage: main.py [-h] --token TOKEN --fqdn FQDN --rrset_name RRSET_NAME [--rrset_type {A,AAAA}] [--create_if_not_exist] [--verbose]
 
-Update a Gandi DNS record (type A) with current IP if the 2 values are different
+Update a Gandi DNS record (type A or AAAA) with current IP if the 2 values are different
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -14,12 +14,16 @@ optional arguments:
   --fqdn FQDN           Full qualified domain name
   --rrset_name RRSET_NAME
                         Name of the record
+  --rrset_type {A,AAAA}
+                        Choice the rrset type (default A) A -> IPv4, AAAA -> IPV6
   --create_if_not_exist
                         If True, create the DNS record with current IP address if it doesn't exist
   --verbose             Print information if True
 ```
 
-Example: `python3 main.py --token {myToken} --fqdn blabla.be --rrset_name test` will update the record for *test.blabla.be* with your current IP.
+Example: 
+* `python3 main.py --token {myToken} --fqdn blabla.be --rrset_name test --rrset_type A` will update the record of type A (IPV4) for *test.blabla.be* with your current IP.
+* `python3 main.py --token {myToken} --fqdn blabla.be --rrset_name test --rrset_type AAAA` will update the record of type AAAA (IPV6) for *test.blabla.be* with your current IP.
 
 It can be simply executed every X minutes with a cron Task
 

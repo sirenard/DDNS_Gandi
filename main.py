@@ -68,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument("--fqdn", required=True, help="Full qualified domain name", type=str)
     parser.add_argument("--rrset_name", required=True, help="Name of the record", type=str)
     parser.add_argument("--rrset_type", default="A", choices=['A', 'AAAA'],
-                        help="Choice the rrset type A -> IPv4, AAAA -> IPV6", type=str)
+                        help="Choice the rrset type (default A) A -> IPv4, AAAA -> IPV6", type=str)
     parser.add_argument("--create_if_not_exist", help="If True, create the DNS record with current IP "
                                                       "address if it doesn't exist", action='store_true')
     parser.add_argument("--verbose", help="Print information if True", action='store_true')
