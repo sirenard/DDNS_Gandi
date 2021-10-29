@@ -6,8 +6,12 @@ from GandiAPI import GandiAPI
 from Record import Record
 
 
-def get_my_ip():
-    response = requests.get("https://api.ipify.org?format=json")
+def get_my_ip(ipv6 = True):
+    if not ipv6:
+        response = requests.get("https://api.ipify.org?format=json")
+    else:
+        response = requests.get("https://ipify.org?format=json")
+
     if response.ok:
         return response.json()["ip"]
     else:
@@ -26,7 +30,7 @@ def update_dns_with_my_ip(conn: GandiAPI, fqdn: str, rrset_name: str, rrset_type
     :return: False if record is not changed, True if it is updated
     """
 
-    my_ip = get_my_ip()
+    my_ip = get_my_ip(rrset_type == "AAAA")
     assert my_ip is not None, "cannot get current IP, myip.com API is maybe down"
 
     record = Record(rrset_name, rrset_type, [my_ip])
@@ -58,10 +62,11 @@ def raise_status_code(result, status_code):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Update a Gandi DNS record (type A) with current IP if the 2 values are different')
+        description='Update a Gandi DNS record (type A or AAAA) with current IP if the 2 values are different')
     parser.add_argument("--token", required=True, help="Api Key of your Gandi Account", type=str)
     parser.add_argument("--fqdn", required=True, help="Full qualified domain name", type=str)
     parser.add_argument("--rrset_name", required=True, help="Name of the record", type=str)
+    parser.add_argument("--rrset_type", default="A", choices=['A', 'AAAA'], help="Choice the rrset type A -> IPv4, AAAA -> IPV6", type=str)
     parser.add_argument("--create_if_not_exist", help="If True, create the DNS record with current IP "
                                                       "address if it doesn't exist", action='store_true')
     parser.add_argument("--verbose", help="Print information if True", action='store_true')
@@ -69,7 +74,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     conn = GandiAPI(args.token)
-    res = update_dns_with_my_ip(conn, args.fqdn, args.rrset_name)
+    res = update_dns_with_my_ip(conn, args.fqdn, args.rrset_name, args.rrset_type, args.create_if_not_exist)
 
     if args.verbose:
         if res:
