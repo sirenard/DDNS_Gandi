@@ -6,7 +6,7 @@ from GandiAPI import GandiAPI
 from Record import Record
 
 
-def get_my_ip(ipv6 = True):
+def get_my_ip(ipv6=True):
     if not ipv6:
         response = requests.get("https://api.ipify.org?format=json")
     else:
@@ -54,9 +54,11 @@ def update_dns_with_my_ip(conn: GandiAPI, fqdn: str, rrset_name: str, rrset_type
 
 def raise_status_code(result, status_code):
     assert status_code != 403, "Access to the resource is denied. Mainly due to a lack of permissions to access it." \
-                               "\n{}".format(result.json())
+                               "\n\t{}".format(
+        "\n\t".join(map(lambda x: x + ": " + str(result.json()[x]), result.json())))
     assert status_code != 404, "the name/type pair does not exist, add parameter 'create_if_not_exist' to create it"
-    assert status_code != 401, "Bad authentication attempt because of a wrong API Key.\n{}".format(result.json())
+    assert status_code != 401, "Bad authentication attempt because of a wrong API Key.\n\t{}".format(
+        "\n\t".join(map(lambda x: x + ": " + str(result.json()[x]), result.json())))
 
 
 if __name__ == '__main__':
@@ -65,7 +67,8 @@ if __name__ == '__main__':
     parser.add_argument("--token", required=True, help="Api Key of your Gandi Account", type=str)
     parser.add_argument("--fqdn", required=True, help="Full qualified domain name", type=str)
     parser.add_argument("--rrset_name", required=True, help="Name of the record", type=str)
-    parser.add_argument("--rrset_type", default="A", choices=['A', 'AAAA'], help="Choice the rrset type A -> IPv4, AAAA -> IPV6", type=str)
+    parser.add_argument("--rrset_type", default="A", choices=['A', 'AAAA'],
+                        help="Choice the rrset type A -> IPv4, AAAA -> IPV6", type=str)
     parser.add_argument("--create_if_not_exist", help="If True, create the DNS record with current IP "
                                                       "address if it doesn't exist", action='store_true')
     parser.add_argument("--verbose", help="Print information if True", action='store_true')
