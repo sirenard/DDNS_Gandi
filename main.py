@@ -37,9 +37,8 @@ def update_dns_with_my_ip(conn: GandiAPI, fqdn: str, rrset_name: str, rrset_type
 
     result = conn.get_domain_record(fqdn, record)
 
-    # If the status code is 404 (record does not exist.) and we want to create it, then we don't want to raise
-    # exceptions
-    if result.status_code != 404 and not create_if_not_exist:
+    # Raise error only if we don't want to create a record or if an other error occurs
+    if result.status_code != 404 or not create_if_not_exist:
         raise_status_code(result, result.status_code)
         current_record_ip = result.json()["rrset_values"][0]
     else:
@@ -56,7 +55,7 @@ def update_dns_with_my_ip(conn: GandiAPI, fqdn: str, rrset_name: str, rrset_type
 def raise_status_code(result, status_code):
     assert status_code != 403, "Access to the resource is denied. Mainly due to a lack of permissions to access it." \
                                "\n{}".format(result.json())
-    assert status_code != 404, "the name/type pair does not exist"
+    assert status_code != 404, "the name/type pair does not exist, add parameter 'create_if_not_exist' to create it"
     assert status_code != 401, "Bad authentication attempt because of a wrong API Key.\n{}".format(result.json())
 
 
